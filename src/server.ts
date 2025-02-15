@@ -12,19 +12,17 @@ const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
 
 const app = express();
-const angularApp = new AngularNodeAppEngine();
+let angularApp: AngularNodeAppEngine | null = null;
 
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/**', (req, res) => {
- *   // Handle API request
- * });
- * ```
+ * Ensure only one instance of AngularNodeAppEngine is created
  */
+function getAngularApp() {
+  if (!angularApp) {
+    angularApp = new AngularNodeAppEngine();
+  }
+  return angularApp;
+}
 
 /**
  * Serve static files from /browser
@@ -38,10 +36,11 @@ app.use(
 );
 
 /**
- * Handle all other requests by rendering the Angular application.
+ * Handle all requests using the Angular application
  */
 app.use('/**', (req, res, next) => {
-  angularApp
+  res.setTimeout(30000); // ⬅ Increase timeout to 30 seconds
+  getAngularApp()
     .handle(req)
     .then((response) =>
       response ? writeResponseToNodeResponse(response, res) : next(),
@@ -49,14 +48,14 @@ app.use('/**', (req, res, next) => {
     .catch(next);
 });
 
+
 /**
  * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
  */
 if (isMainModule(import.meta.url)) {
   const port = process.env['PORT'] || 4000;
   app.listen(port, () => {
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    console.log(`✅ Node Express server listening on http://localhost:${port}`);
   });
 }
 

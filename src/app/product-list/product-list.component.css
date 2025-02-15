@@ -1,0 +1,32 @@
+.product-list {
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.product {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: white;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+.buy-btn {
+  padding: 8px;
+  background-color: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.high {
+  color: green;
+  font-weight: bold;
+}
+
+.low {
+  color: red;
+  font-weight: bold;
+}
