@@ -4,7 +4,7 @@ export const PRODUCT_DATA: Product[] = [
     {
       "id": 2124,
       "name": "Gold($)",
-      "values": { "current": 2909.60, "high": 2909.60, "low": 2910.85, "previous": 2860.15 }
+      "values": { "current": 209.60, "high": 2909.60, "low": 2910.85, "previous": 2860.15 }
     },
     {
       "id": 2125,

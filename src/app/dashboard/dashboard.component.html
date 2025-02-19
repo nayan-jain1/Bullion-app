@@ -1,44 +1,51 @@
-<div class="dashboard-container">
-  <h2>Live Market Rates</h2>
+<!--  for staic data display  -->
 
-  <!-- Display Live Rates -->
-  <div class="rates">
-    <div class="rate-item">
-      <label>Gold ($):</label> <span>{{ goldRate }}</span>
-    </div>
-    <div class="rate-item">
-      <label>Silver:</label> <span>{{ silverRate }}</span>
-    </div>
-    <div class="rate-item">
-      <label>USD:</label> <span>{{ usdRate }}</span>
-    </div>
-  </div>
+<!-- <div class="buttn">
+  <button class="font" (click)="selectTab('gold')">Gold Rates</button>
+  <button class="font" (click)="selectTab('silver')">Silver Rates</button>
+  <button class="font" (click)="selectTab('usd')">USD Rates</button>
+</div> -->
 
-  <!-- Tab Navigation -->
-  <div class="tabs">
-    <button 
-      *ngFor="let tab of ['gold', 'silver', 'usd']" 
-      [class.active]="selectedTab === tab"
-      (click)="selectTab(tab)">
-      {{ tab | titlecase }}
-    </button>
-  </div>
-
-  <!-- Product List -->
-  <div class="product-list">
-    <table>
-      <thead>
-        <tr>
-          <th>Product Name</th>
-          <th>Current Rate</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let product of filteredProducts">
-          <td>{{ product.name }}</td>
-          <td>{{ product.values.current }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<div class="rates">
+  <h2>Gold ($) <br> {{ goldRate }}</h2>
+  <h2>Silver ($) <br> {{ silverRate }}</h2>
+  <h2>USD <br> {{ usdRate }}</h2>
 </div>
+
+<table class="rate-table">
+  <tr>
+    <th>Product</th>
+    <th>Current Rate</th>
+    <th>High</th>
+    <th>Low</th>
+    <th>Previous</th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let product of filteredProducts">
+    <td>{{ product.name }}</td>
+    <td>{{ product.values.current }}</td>
+    <td>{{ product.values.high }}</td>
+    <td>{{ product.values.low }}</td>
+    <td>{{ product.values.previous }}</td>
+    <td><button class="buy-btn">Buy</button></td>
+  </tr>
+</table>
+
+
+
+
+<!-- // for dynamic data display  -->
+
+<!-- <table class="rate-table">
+  <tr>
+    <th>Product</th>
+    <th>Rate ({{ valueKeys[currentIndex] }})</th> // Display the current value key
+    <th></th>
+  </tr>
+  <tr *ngFor="let product of filteredProducts">
+    <td>{{ product.name }}</td>
+    <td>{{ product.values[valueKeys[currentIndex]] }}</td> // Display the value based on currentIndex
+    <td><button class="buy-btn">Buy</button></td>
+  </tr>
+</table> 
+ -->

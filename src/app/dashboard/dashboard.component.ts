@@ -1,94 +1,152 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CommonModule } from '@angular/common';
-import { interval, Subscription, of } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule, NgFor } from '@angular/common';
+
+
+interface Product {
+  id: number;
+  name: string;
+  values: {
+    current: number;
+    high: number;
+    low: number;
+    previous: number;
+  };
+}
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true, 
-  imports: [CommonModule], 
+  standalone: true,
+  imports:[CommonModule, HttpClientModule, NgFor],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit, OnDestroy {
-  goldRate = 0;
-  silverRate = 0;
-  usdRate = 0;
+export class DashboardComponent implements OnInit {
+  apiUrl = 'https://bcast.aaravbullion.in/VOTSBroadcastStreaming/Services/xml/GetLiveRateByTemplateID/aarav?_=1738585907196';
+  filteredProducts: Product[] = [];
   selectedTab = 'gold';
-  filteredProducts: any[] = [];
-  private apiSubscription!: Subscription;
-  private apiUrl = 'https://bcast.aaravbullion.in/VOTSBroadcastStreaming/Services/xml/GetLiveRateByTemplateID/aarav?_=1738585907196';
+  goldRate: string = 'Loading...';
+  silverRate: string = 'Loading...';
+  usdRate: string = 'Loading...';
+gold: any;
 
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.fetchRates();
-    this.selectTab('gold');
+    this.fetchData(); // Fetch initial data
 
-    // Fetch updated JSON data every 500ms
-    this.apiSubscription = interval(20000).pipe(
-      switchMap(() =>
-        this.http.get(this.apiUrl, { responseType: 'text' }).pipe(
-          catchError(error => {
-            console.error('Error fetching data:', error);
-            return of('');
-          })
-        )
-      )
-    ).subscribe(data => {
-      const parsedData = this.parseTextData(data);
-      this.updateRates(parsedData);
-    });
+    setInterval(() => {
+      this.fetchData(); // Fetch new data every 5 seconds
+    }, 5000);
   }
 
-  ngOnDestroy(): void {
-    if (this.apiSubscription) {
-      this.apiSubscription.unsubscribe();
-    }
-  }
+  fetchData(): void {
+    console.log('Fetching data from:', this.apiUrl);
 
-  fetchRates(): void {
-    this.http.get(this.apiUrl, { responseType: 'text' }).subscribe(
-      (data: string) => {
-        const parsedData = this.parseTextData(data);
-        this.updateRates(parsedData);
+    this.http.get<string>(this.apiUrl, { responseType: 'text' as 'json' }).subscribe(
+      (response) => {
+        console.log('Raw API Response:', response);
+        
+        this.filteredProducts = this.parseApiResponse(response);
+        this.updateRates();
       },
-      error => console.error('Error fetching initial data:', error)
+      (error) => {
+        console.error('Error fetching data:', error);
+      }
     );
   }
 
-  parseTextData(data: string) {
-    if (!data) return { gold: 0, silver: 0, usd: 0, products: [] };
-  
-    const lines = data.trim().split('\r\n');
-    const values = lines[0]?.split('\t') || [];
-  
-    return {
-      gold: parseFloat(values[2]) || 0,
-      silver: parseFloat(values[2]) || 0,
-      usd: parseFloat(values[2]) || 0,
-      products: lines.slice(1).map(line => {
-        const cols = line.split('\t');
-        return {
-          name: cols[1] || '',
-          values: { current: parseFloat(cols[2]) || 0 }
+  parseApiResponse(data: string): Product[] {
+    const lines = data.split('\n'); // Split response into lines
+    const products: Product[] = [];
+
+    lines.forEach((line) => {
+      const parts = line.trim().split(/\s+/); // Split each line by spaces
+
+      if (parts.length >= 6) {
+        const product: Product = {
+          id: Number(parts[0]),
+          name: parts.slice(1, parts.length - 4).join(' '), // Extract product name
+          values: {
+            current: parseFloat(parts[parts.length - 4]),
+            high: parseFloat(parts[parts.length - 3]),
+            low: parseFloat(parts[parts.length - 2]),
+            previous: parseFloat(parts[parts.length - 1])
+          }
         };
-      })
-    };
-  }
-  
-  updateRates(data: any): void {
-    this.goldRate = data.gold;
-    this.silverRate = data.silver;
-    this.usdRate = data.usd;
-    this.filteredProducts = data.products;
+        products.push(product);
+      }
+    });
+
+    console.log('Parsed Products:', products);
+    return products;
   }
 
-  selectTab(tab: string): void {
-    this.selectedTab = tab;
-    this.filteredProducts = this.filteredProducts.filter(product =>
-      product.name.toLowerCase().includes(tab)
-    );
+  updateRates(): void {
+    const gold = this.filteredProducts.find(p => p.name.includes('Gold($)'));
+    const silver = this.filteredProducts.find(p => p.name.includes('Silver'));
+    const usd = this.filteredProducts.find(p => p.name.includes('USD'));
+
+    this.goldRate = gold ? `${gold.values.current} | H: ${gold.values.high} | L: ${gold.values.low} | P: ${gold.values.previous}` : 'N/A';
+    this.silverRate = silver ? `${silver.values.current} | H: ${silver.values.high} | L: ${silver.values.low} | P: ${silver.values.previous}` : 'N/A';
+    this.usdRate = usd ? `${usd.values.current} | H: ${usd.values.high} | L: ${usd.values.low} | P: ${usd.values.previous}` : 'N/A';
   }
+
+//   selectTab(tab: string): void {
+//         this.selectedTab = tab;
+//         this.filteredProducts = PRODUCT_DATA.filter(p => 
+//           p.name.toLowerCase().includes(tab.toLowerCase()) && p.values
+//         );
+//         this.updateRates(); 
+//       }
 }
+
+
+
+//  working logic with static values 
+
+// import { Component, OnInit } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { Product } from '../models/product-model';
+// import { PRODUCT_DATA } from '../data/product-data';
+
+// @Component({
+//   selector: 'app-dashboard',
+//   standalone: true,
+//   imports: [CommonModule],
+//   templateUrl: './dashboard.component.html',
+//   styleUrls: ['./dashboard.component.css']
+// })
+// export class DashboardComponent implements OnInit {
+//   goldRate = { current: 0, high: 0, low: 0, previous: 0 };
+//   silverRate = { current: 0, high: 0, low: 0, previous: 0 };
+//   usdRate = { current: 0, high: 0, low: 0, previous: 0 };
+//   selectedTab = 'gold';
+//   filteredProducts: Product[] = [];
+  
+//   ngOnInit(): void {
+//     this.updateRates();
+//     this.selectTab('gold'); // Default tab
+//     this.filteredProducts = PRODUCT_DATA;
+//   }
+
+//   updateRates(): void {
+//     const gold = PRODUCT_DATA.find(p => p.name === 'Gold($)');
+//     const silver = PRODUCT_DATA.find(p => p.name === 'Silver');
+//     const usd = PRODUCT_DATA.find(p => p.name === 'USD');
+  
+//     this.goldRate = gold?.values ?? { current: 0, high: 0, low: 0, previous: 0 };
+//     this.silverRate = silver?.values ?? { current: 0, high: 0, low: 0, previous: 0 };
+//     this.usdRate = usd?.values ?? { current: 0, high: 0, low: 0, previous: 0 };
+//   }
+
+//   selectTab(tab: string): void {
+//     this.selectedTab = tab;
+//     this.filteredProducts = PRODUCT_DATA.filter(p => 
+//       p.name.toLowerCase().includes(tab.toLowerCase()) && p.values
+//     );
+//   }
+// }
+
+
