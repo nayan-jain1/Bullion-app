@@ -11,9 +11,13 @@
   h1 {
     font-size: 24px;
     color:blue;
+    margin: 10px;
   }
   .contact {
     font-size: 16px;
     font-weight: bold;
+  }
+  .heading{
+    text-decoration: none; 
   }
   

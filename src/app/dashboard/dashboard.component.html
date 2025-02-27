@@ -1,5 +1,4 @@
-<!--  for staic data display  -->
-
+<div>
 <!-- <div class="buttn">
   <button class="font" (click)="selectTab('gold')">Gold Rates</button>
   <button class="font" (click)="selectTab('silver')">Silver Rates</button>
@@ -27,25 +26,7 @@
     <td>{{ product.values.high }}</td>
     <td>{{ product.values.low }}</td>
     <td>{{ product.values.previous }}</td>
-    <td><button class="buy-btn">Buy</button></td>
+    <td><button class="buy-btn" (click)="buyProduct()">Buy</button></td>
   </tr>
 </table>
-
-
-
-
-<!-- // for dynamic data display  -->
-
-<!-- <table class="rate-table">
-  <tr>
-    <th>Product</th>
-    <th>Rate ({{ valueKeys[currentIndex] }})</th> // Display the current value key
-    <th></th>
-  </tr>
-  <tr *ngFor="let product of filteredProducts">
-    <td>{{ product.name }}</td>
-    <td>{{ product.values[valueKeys[currentIndex]] }}</td> // Display the value based on currentIndex
-    <td><button class="buy-btn">Buy</button></td>
-  </tr>
-</table> 
- -->
+</div>

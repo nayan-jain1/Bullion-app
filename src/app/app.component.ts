@@ -2,13 +2,12 @@ import { Component } from '@angular/core';
 import { FooterComponent } from "./footer/footer.component";
 import { HeaderComponent } from "./header/header.component";
 import { NavbarComponent } from "./navbar/navbar.component";
-import { DashboardComponent } from "./dashboard/dashboard.component";
-//import { LoginComponent } from './login/login.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true, 
-  imports: [ FooterComponent, HeaderComponent, NavbarComponent, DashboardComponent],
+  imports: [ RouterModule, FooterComponent, HeaderComponent, NavbarComponent,],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

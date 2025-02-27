@@ -4,6 +4,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { CommonModule, NgFor } from '@angular/common';
 
 
+
 interface Product {
   id: number;
   name: string;
@@ -18,7 +19,7 @@ interface Product {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, NgFor,],
+  imports: [ CommonModule, HttpClientModule, NgFor,],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -59,6 +60,10 @@ gold: any;
         console.error('Error fetching data:', error);
       }
     );
+  }
+
+  buyProduct(){
+    alert('Success! Your purchase is completed')
   }
 
   parseApiResponse(data: string): Product[] {
