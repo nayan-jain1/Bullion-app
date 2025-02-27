@@ -1,12 +1,16 @@
+import 'zone.js/node';
+import express from 'express';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
-import express from 'express';
-import { dirname, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+
+import bootstrap from './main.server';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -36,7 +40,7 @@ app.use(
 );
 
 /**
- * Handle all requests using the Angular application
+ * Handle all requests using Angular Universal SSR
  */
 app.use('/**', (req, res, next) => {
   res.setTimeout(30000); // ⬅ Increase timeout to 30 seconds
@@ -47,7 +51,6 @@ app.use('/**', (req, res, next) => {
     )
     .catch(next);
 });
-
 
 /**
  * Start the server if this module is the main entry point.

@@ -18,7 +18,7 @@ interface Product {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports:[CommonModule, HttpClientModule, NgFor],
+  imports: [CommonModule, HttpClientModule, NgFor,],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -30,6 +30,9 @@ export class DashboardComponent implements OnInit {
   silverRate: string = 'Loading...';
   usdRate: string = 'Loading...';
 gold: any;
+  goldCurrentRate: any;
+  silverCurrentRate : any;
+  usdCurrentRate: any;
 
   constructor(private http: HttpClient) {}
 
@@ -42,14 +45,15 @@ gold: any;
   }
 
   fetchData(): void {
-    console.log('Fetching data from:', this.apiUrl);
+    
 
     this.http.get<string>(this.apiUrl, { responseType: 'text' as 'json' }).subscribe(
       (response) => {
-        console.log('Raw API Response:', response);
-        
+       
         this.filteredProducts = this.parseApiResponse(response);
         this.updateRates();
+
+       
       },
       (error) => {
         console.error('Error fetching data:', error);
@@ -81,6 +85,8 @@ gold: any;
 
     console.log('Parsed Products:', products);
     return products;
+
+    
   }
 
   updateRates(): void {
@@ -91,6 +97,11 @@ gold: any;
     this.goldRate = gold ? `${gold.values.current} | H: ${gold.values.high} | L: ${gold.values.low} | P: ${gold.values.previous}` : 'N/A';
     this.silverRate = silver ? `${silver.values.current} | H: ${silver.values.high} | L: ${silver.values.low} | P: ${silver.values.previous}` : 'N/A';
     this.usdRate = usd ? `${usd.values.current} | H: ${usd.values.high} | L: ${usd.values.low} | P: ${usd.values.previous}` : 'N/A';
+
+    this.goldCurrentRate = this.filteredProducts[0].values.current;
+    console.log('silver',this.filteredProducts);
+    this.silverCurrentRate = this.filteredProducts[1].values.current;
+    this.usdCurrentRate = this.filteredProducts[2].values.current;
   }
 
 //   selectTab(tab: string): void {
